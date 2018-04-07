@@ -1,43 +1,51 @@
 
+"use strict"
 // функция активации формы
 function activateForm () {
-  var elements = document.getElementsByClassName('map--faded');
-  elements[0].classList.remove('map--faded');
-  var form = document.getElementsByClassName('ad-form--disabled');
-  form[0].classList.remove('ad-form--disabled');
+  var mapFadedElement = document.getElementsByClassName('map--faded')[0];
+  mapFadedElement.classList.remove('map--faded');
+  var formDisabledElement = document.getElementsByClassName('ad-form--disabled')[0];
+  formDisabledElement.classList.remove('ad-form--disabled');
+  pinElement.removeEventListener('click', activateForm);
   }
-var element = document.getElementById('drag__pin');
-element.addEventListener('click', activateForm , false);
+var pinElement = document.getElementById('drag__pin');
+pinElement.addEventListener('click', activateForm);
 // функция активации формы
 
 // перетаскивание кнопки
-var btn = document.getElementById('drag__pin');
 
 var btnPressed = false;
-
-btn.addEventListener('mousedown', function(e) {
-  btnPressed = true;
-  px = e.clientX;
-  py = e.clientY;
-});
-
-btn.addEventListener('mouseup', function(e) {
-  btnPressed = false;
-})
-
-window.addEventListener('mouseup', function(e) {
-  btn.style.MozTransform = "";
-  btn.style.WebkitTransform = "";
-  btn.style.opacity = 1;
-})
-
-window.addEventListener('mousemove', function(e) {
-  if(btnPressed) {
-    dx = e.clientX - px;
-    dy = e.clientY - py;
-    btn.style.opacity = 0.85;
-    btn.style.MozTransform = "translate(" + dx + "px, " + dy + "px)";
-    btn.style.WebkitTransform = "translate(" + dx + "px, " + dy + "px)";
+var px, py, dx, dy;
+pinElement.addEventListener('mousedown', function getMouseCoordinates(e) {
+    btnPressed = true;
+    px = e.clientX;
+    py = e.clientY;
   }
-})
+);
+
+pinElement.addEventListener('mouseup', function buttonReleased(e) {
+    btnPressed = false;
+  }
+);
+
+document.addEventListener('mouseup', function documentOnMouseUp(e) {
+    pinElement.style.MozTransform = "";
+    pinElement.style.WebkitTransform = "";
+    pinElement.style.opacity = 1;
+  }
+);
+
+document.addEventListener('mousemove', function windowOnMouseMove(e) {
+    if(btnPressed) {
+      dx = e.clientX - px;
+      dy = e.clientY - py;
+      pinElement.style.opacity = 0.85;
+      pinElement.style.MozTransform = "translate(" + dx + "px, " + dy + "px)";
+      pinElement.style.WebkitTransform = "translate(" + dx + "px, " + dy + "px)";
+    }
+    document.removeEventListener('mouseup', windowOnMouseMove, true);
+  }
+);
+
+//
 // перетаскивание кнопки
