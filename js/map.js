@@ -36,36 +36,39 @@ function createNewPhoto(tag, classTag, text) {
   }
   return newPhoto;
 }
-
-// Массив предложения
-var dataOffer = {
-  author: {
-    avatar: 'img/avatars/user0' + getRandomInteger(1, 8) + '.png'
-  },
-
-  offer: {
-    title: getRandomElementArray(titleOffer),
-    address: function() {
-      return dataOffer.location.x + ', ' + dataOffer.location.y;
+// Функция для создания предложений
+function createNewElementArray() {
+  // Массив предложения
+  var firstDataOffer = {
+    author: {
+      avatar: 'img/avatars/user0' + getRandomInteger(1, 8) + '.png'
     },
-    price: getRandomInteger(1000, 1000000),
-    type: getRandomElementArray(typeOffer),
-    rooms: getRandomInteger(1, 5),
-    // не понятно какое максимальное количество гостей можно разместить?
-    guests: getRandomInteger(1, 10),
-    checkin: getRandomElementArray(checkinOffer),
-    checkout: getRandomElementArray(checkoutOffer),
-    // как это сделать такой массив?
-    features: 'массив строк случайной длины из ниже предложенных: "wifi", "dishwasher", "parking", "washer", "elevator", "conditioner"',
-    description: '',
-    photos: sortRandomElementArray(photosOffer)
-  },
 
-  location: {
-    x: getRandomInteger(300, 900),
-    y: getRandomInteger(150, 500)
-  }
-};
+    offer: {
+      title: getRandomElementArray(titleOffer),
+      address: function() {
+        return firstDataOffer.location.x + ', ' + firstDataOffer.location.y;
+      },
+      price: getRandomInteger(1000, 1000000),
+      type: getRandomElementArray(typeOffer),
+      rooms: getRandomInteger(1, 5),
+      // ????????????????? не понятно какое максимальное количество гостей можно разместить
+      guests: getRandomInteger(1, 10),
+      checkin: getRandomElementArray(checkinOffer),
+      checkout: getRandomElementArray(checkoutOffer),
+      // ??????????????????????????????? как это сделать такой массив
+      features: 'массив строк случайной длины из ниже предложенных: "wifi", "dishwasher", "parking", "washer", "elevator", "conditioner"',
+      description: '',
+      photos: sortRandomElementArray(photosOffer)
+    },
+
+    location: {
+      x: getRandomInteger(300, 900),
+      y: getRandomInteger(150, 500)
+    }
+  };
+  return firstDataOffer;
+}
 
 // Удаляем класс map__faded
 var activeMap = document.querySelector('.map');
@@ -82,7 +85,9 @@ function createPin(entryArray) {
   pinImg.alt = entryArray.offer.title;
   return pinTemplate;
 }
-activeMap.querySelector('.map__pins').appendChild(createPin(dataOffer));
+
+var pinData = createNewElementArray()
+activeMap.querySelector('.map__pins').appendChild(createPin(pinData));
 
 // Функция рандомного заполнения блока DOM-элементами
 function createMapCard(entryArray) {
@@ -104,11 +109,8 @@ function createMapCard(entryArray) {
     imgOffer.src = entryArray.offer.photos[i];
     imagesOffer.appendChild(imgOffer);
   }
-
-
-
   return mapCardTemplate;
 };
-// Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.???
-
-activeMap.appendChild(createMapCard(dataOffer));
+// ??????????????? Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.
+activeMap.appendChild(createMapCard(pinData));
+// ???????????? Не получилось, чтобы Пинов на карте было 5 штук, как выполнить
