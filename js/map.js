@@ -25,6 +25,16 @@ function sortRandomElementArray(ArrayName) {
     return Math.random - 0.5;
   }
   return ArrayName.sort(mixElementArray)
+};
+
+// Функция для создания фото к предложению
+function createNewPhoto(tag, classTag, text) {
+  var newPhoto = document.createElement(tag);
+  newPhoto.classList.add(classTag);
+  if (text) {
+    newPhoto.textContent = text;
+  }
+  return newPhoto;
 }
 
 // Массив предложения
@@ -85,7 +95,18 @@ function createMapCard(entryArray) {
   mapCardTemplate.querySelector('.popup__text--time').textContent = 'Заезд после ' + entryArray.offer.checkin + ' ,' + ' выезд до ' + entryArray.offer.checkout;
   mapCardTemplate.querySelector('.popup__features').classList.add('popup__feature--wifi');
   mapCardTemplate.querySelector('.popup__description').textContent = entryArray.offer.description;
-  mapCardTemplate.querySelector('.popup__photos img').src = 'http://o0.github.io/assets/images/tokyo/hotel1.jpg'
+// Добавляю фото к предложению
+  for (var i = 0; i < entryArray.offer.photos.length; i++) {
+    var imagesOffer = mapCardTemplate.querySelector('.popup__photos');
+    var imgOffer = createNewPhoto('img', 'popup__photo');
+    imgOffer.width = 45;
+    imgOffer.height = 40;
+    imgOffer.src = entryArray.offer.photos[i];
+    imagesOffer.appendChild(imgOffer);
+  }
+
+
+
   return mapCardTemplate;
 };
 // Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.???
