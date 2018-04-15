@@ -129,7 +129,7 @@ function removeChildren(list) {
 
 function createMapCard(evt) {
   if (checkIfCardIsOpen()) {
-    closeMapCard();
+    buttonClickHandler();
   }
   var singleOffer = offers[evt.target.id];
   var map = document.querySelector('.map');
@@ -165,22 +165,26 @@ function createMapCard(evt) {
     photo.src = singleOffer.offer.photos[j];
     fragment.appendChild(photo);
   }
-  newMapCard.querySelector('.popup__close').addEventListener('click', closeMapCard);
+  newMapCard.querySelector('.popup__close').addEventListener('click', buttonClickHandler);
   photos.removeChild(photoTemplate);
   photos.appendChild(fragment);
+  window.addEventListener('keydown', windowEscKeyDownHandler);
   map.insertBefore(newMapCard, mapFiltersContainer);
 }
 
 // Фукнция закрытия карточки
-function closeMapCard() {
+function buttonClickHandler() {
+  window.removeEventListener('keydown', windowEscKeyDownHandler);
   var map = document.querySelector('.map');
   var popup = document.querySelector('.popup');
   map.removeChild(popup);
 }
 
 var mainPin = document.querySelector('.map__pin--main');
-var PIN_CENTER_X = 600;
-var PIN_CENTER_Y = 300;
+var offsetLeft = mainPin.offsetLeft - 1;
+var offsetTop = mainPin.offsetTop;
+var PIN_CENTER_X = offsetLeft;
+var PIN_CENTER_Y = offsetTop;
 var addressFieldset = document.querySelector('#address');
 addressFieldset.value = PIN_CENTER_X + ', ' + PIN_CENTER_Y;
 
@@ -206,29 +210,30 @@ function getActiveFieldsets() {
 }
 
 
-mainPin.addEventListener('mouseup', activateForm);
-window.addEventListener('keydown', activateFormByEnter);
-window.addEventListener('keydown', closeCardByEsc);
+mainPin.addEventListener('mouseup', mainPinMouseUpHandler);
+window.addEventListener('keydown', windowEnterKeyDownHandler);
 
-function activateForm() {
+// Фнукция активации формы
+function mainPinMouseUpHandler() {
   getActiveForm();
   getActiveFieldsets();
   getActiveMap();
   createPins(offers);
 
-  mainPin.removeEventListener('click', activateForm);
+  mainPin.removeEventListener('mouseup', mainPinMouseUpHandler);
+  window.removeEventListener('keydown', windowEnterKeyDownHandler);
 }
 
-function activateFormByEnter(evt) {
+function windowEnterKeyDownHandler(evt) {
   if (evt.keyCode === KeyCodes.ENTER) {
-    activateForm();
+    mainPinMouseUpHandler();
   }
 }
 
-function closeCardByEsc(evt) {
+function windowEscKeyDownHandler(evt) {
   evt.preventDefault();
   if (evt.keyCode === KeyCodes.ESC) {
-    closeMapCard();
+    buttonClickHandler();
   }
 }
 
