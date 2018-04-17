@@ -220,6 +220,9 @@ function mainPinMouseUpHandler() {
   getActiveMap();
   createPins(offers);
 
+  selectRoomNumberChangeHandler();
+  // getOptionsRoom();
+
   mainPin.removeEventListener('mouseup', mainPinMouseUpHandler);
   window.removeEventListener('keydown', windowEnterKeyDownHandler);
 }
@@ -241,3 +244,107 @@ function checkIfCardIsOpen() {
   var popup = document.querySelector('.popup');
   return popup ? true : false;
 }
+
+var adForm = document.querySelector('.ad-form');
+
+
+var selectRoomNumber = adForm.elements.namedItem('rooms');
+selectRoomNumber.addEventListener('change', selectRoomNumberChangeHandler);
+
+// var selectGuestNumber = adForm.elements.namedItem('capacity');
+// selectGuestNumber.addEventListener('change', getOptionsRoom);
+
+// Синхронизация полей типа жилья и цены
+var selectHouseType = document.querySelector('#type');
+var inputHousePrice = document.querySelector('#price');
+selectHouseType.addEventListener('change', function (evt) {
+  if (evt.currentTarget.value === 'bungalo') {
+    inputHousePrice.placeholder = '0';
+    inputHousePrice.min = 0;
+  } else if (evt.currentTarget.value === 'flat') {
+    inputHousePrice.placeholder = '1000';
+    inputHousePrice.min = 1000;
+  } else if (evt.currentTarget.value === 'house') {
+    inputHousePrice.placeholder = 5000;
+    inputHousePrice.min = 5000;
+  } else if (evt.currentTarget.value === 'palace') {
+    inputHousePrice.placeholder = '10000';
+    inputHousePrice.min = 10000;
+  }
+});
+
+function selectRoomNumberChangeHandler() {
+  var capacity = document.querySelector('#capacity');
+  var roomNumber = document.querySelector('#room_number');
+  var options = capacity.querySelectorAll('option');
+  for (var i = 0; i < options.length; i++) {
+    capacity.removeChild(options[i]);
+  }
+  var newOptions = [];
+  switch (roomNumber.value) {
+    case '1':
+      newOptions.push({value: '1', text: 'для 1 гостя'});
+      break;
+    case '2':
+      newOptions.push({value: '1', text: 'для 1 гостя'});
+      newOptions.push({value: '2', text: 'для 2 гостей'});
+      break;
+    case '3':
+      newOptions.push({value: '1', text: 'для 1 гостя'});
+      newOptions.push({value: '2', text: 'для 2 гостей'});
+      newOptions.push({value: '3', text: 'для 3 гостей'});
+      break;
+    case '100':
+      newOptions.push({value: '0', text: 'не для гостей'});
+      break;
+  }
+  for (var j = 0; j < newOptions.length; j++) {
+    var optionElement = document.createElement('option');
+    optionElement.setAttribute('value', newOptions[j].value);
+    optionElement.textContent = newOptions[j].text;
+    capacity.appendChild(optionElement);
+  }
+}
+
+// function getOptionsRoom() {
+//   var roomNumber = document.querySelector('#room_number');
+//   var capacity = document.querySelector('#capacity');
+//   var options = roomNumber.querySelectorAll('option');
+//   for (var i = 0; i < options.length; i++) {
+//     roomNumber.removeChild(options[i]);
+//   }
+//   var newOptions = [];
+//   switch (capacity.value) {
+//     case '1':
+//       newOptions.push({value: '1', text: '1 комната'});
+//       break;
+//     case '2':
+//       newOptions.push({value: '1', text: '1 комната'});
+//       newOptions.push({value: '2', text: '2 комнаты'});
+//       break;
+//     case '3':
+//       newOptions.push({value: '1', text: '1 комната'});
+//       newOptions.push({value: '2', text: '2 комнаты'});
+//       newOptions.push({value: '3', text: '3 комнаты'});
+//       break;
+//     case '0':
+//       newOptions.push({value: '100', text: '100 комнат'});
+//       break;
+//   }
+//   for (var j = 0; j < newOptions.length; j++) {
+//     var optionElement = document.createElement('option');
+//     optionElement.setAttribute('value', newOptions[j].value);
+//     optionElement.textContent = newOptions[j].text;
+//     roomNumber.appendChild(optionElement);
+//   }
+// }
+
+// Синхронизация времени заезда и времени выезда
+var selectTimeIn = document.querySelector('#timein');
+var selectTimeOut = document.querySelector('#timeout');
+selectTimeIn.addEventListener('change', function (evt) {
+  selectTimeOut.value = evt.currentTarget.value;
+});
+selectTimeOut.addEventListener('change', function (evt) {
+  selectTimeIn.value = evt.currentTarget.value;
+});
