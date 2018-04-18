@@ -118,6 +118,13 @@ function createPins(offersList) {
   pins.appendChild(pinFragment);
 }
 
+function deletePins() {
+  var pins = document.querySelector('.map__pins');
+  var buttons = pins.querySelectorAll('button');
+  for (var i = 1; i < buttons.length; i++) {
+    pins.removeChild(buttons[i]);
+  }
+}
 
 function removeChildren(list) {
   while (list.querySelector('li')) {
@@ -213,7 +220,7 @@ function getActiveFieldsets() {
 mainPin.addEventListener('mouseup', mainPinMouseUpHandler);
 window.addEventListener('keydown', windowEnterKeyDownHandler);
 
-// Фнукция активации формы
+// Функция активации формы
 function mainPinMouseUpHandler() {
   getActiveForm();
   getActiveFieldsets();
@@ -221,7 +228,7 @@ function mainPinMouseUpHandler() {
   createPins(offers);
 
   selectRoomNumberChangeHandler();
-  // getOptionsRoom();
+  selectHouseTypeChangeHandler();
 
   mainPin.removeEventListener('mouseup', mainPinMouseUpHandler);
   window.removeEventListener('keydown', windowEnterKeyDownHandler);
@@ -251,27 +258,32 @@ var adForm = document.querySelector('.ad-form');
 var selectRoomNumber = adForm.elements.namedItem('rooms');
 selectRoomNumber.addEventListener('change', selectRoomNumberChangeHandler);
 
-// var selectGuestNumber = adForm.elements.namedItem('capacity');
-// selectGuestNumber.addEventListener('change', getOptionsRoom);
+var selectGuestNumber = adForm.elements.namedItem('capacity');
 
-// Синхронизация полей типа жилья и цены
 var selectHouseType = document.querySelector('#type');
-var inputHousePrice = document.querySelector('#price');
-selectHouseType.addEventListener('change', function (evt) {
-  if (evt.currentTarget.value === 'bungalo') {
-    inputHousePrice.placeholder = '0';
-    inputHousePrice.min = 0;
-  } else if (evt.currentTarget.value === 'flat') {
-    inputHousePrice.placeholder = '1000';
-    inputHousePrice.min = 1000;
-  } else if (evt.currentTarget.value === 'house') {
-    inputHousePrice.placeholder = 5000;
-    inputHousePrice.min = 5000;
-  } else if (evt.currentTarget.value === 'palace') {
-    inputHousePrice.placeholder = '10000';
-    inputHousePrice.min = 10000;
+selectHouseType.addEventListener('change', selectHouseTypeChangeHandler);
+
+function selectHouseTypeChangeHandler() {
+  var inputHousePrice = document.querySelector('#price');
+  inputHousePrice.removeAttribute('placeholder');
+  var newOptions;
+  switch (selectHouseType.value) {
+    case 'bungalo':
+      newOptions = {placeholder: '0', min: '0'};
+      break;
+    case 'flat':
+      newOptions = {placeholder: '1000', min: '1000'};
+      break;
+    case 'house':
+      newOptions = {placeholder: '5000', min: '5000'};
+      break;
+    case 'palace':
+      newOptions = {placeholder: '10000', min: '10000'};
+      break;
   }
-});
+  inputHousePrice.setAttribute('placeholder', newOptions.placeholder);
+  inputHousePrice.setAttribute('min', newOptions.min);
+}
 
 function selectRoomNumberChangeHandler() {
   var capacity = document.querySelector('#capacity');
@@ -306,39 +318,6 @@ function selectRoomNumberChangeHandler() {
   }
 }
 
-// function getOptionsRoom() {
-//   var roomNumber = document.querySelector('#room_number');
-//   var capacity = document.querySelector('#capacity');
-//   var options = roomNumber.querySelectorAll('option');
-//   for (var i = 0; i < options.length; i++) {
-//     roomNumber.removeChild(options[i]);
-//   }
-//   var newOptions = [];
-//   switch (capacity.value) {
-//     case '1':
-//       newOptions.push({value: '1', text: '1 комната'});
-//       break;
-//     case '2':
-//       newOptions.push({value: '1', text: '1 комната'});
-//       newOptions.push({value: '2', text: '2 комнаты'});
-//       break;
-//     case '3':
-//       newOptions.push({value: '1', text: '1 комната'});
-//       newOptions.push({value: '2', text: '2 комнаты'});
-//       newOptions.push({value: '3', text: '3 комнаты'});
-//       break;
-//     case '0':
-//       newOptions.push({value: '100', text: '100 комнат'});
-//       break;
-//   }
-//   for (var j = 0; j < newOptions.length; j++) {
-//     var optionElement = document.createElement('option');
-//     optionElement.setAttribute('value', newOptions[j].value);
-//     optionElement.textContent = newOptions[j].text;
-//     roomNumber.appendChild(optionElement);
-//   }
-// }
-
 // Синхронизация времени заезда и времени выезда
 var selectTimeIn = document.querySelector('#timein');
 var selectTimeOut = document.querySelector('#timeout');
@@ -348,3 +327,42 @@ selectTimeIn.addEventListener('change', function (evt) {
 selectTimeOut.addEventListener('change', function (evt) {
   selectTimeIn.value = evt.currentTarget.value;
 });
+
+// ?????? есть ли необходимость оставить эту проверку??? Новый вариант Проверка правильности заполнения полей количество гостей и комнат
+function checkGuestAndRoomValidity() {
+  var roomNumber = selectRoomNumber.value;
+  var guestnumber = selectGuestNumber.value;
+  if (roomNumber < guestnumber) {
+    selectGuestNumber.setCustomValidity('Мало места для гостей!');
+  } else if (roomNumber === 100 & guestnumber !== 0) {
+    selectGuestNumber.setCustomValidity('Слишком много места не для гостей!');
+  } else {
+    selectGuestNumber.setCustomValidity('');
+  }
+}
+selectRoomNumber.addEventListener('change', checkGuestAndRoomValidity);
+selectGuestNumber.addEventListener('change', checkGuestAndRoomValidity);
+
+// Функция сброса данных при нажатии кнопки очистить
+var resetButton = document.querySelector('.ad-form__reset');
+resetButton.addEventListener('click', resetButtonClickHandler);
+
+function resetButtonClickHandler() {
+  deletePins();
+  resetInputData();
+  if (checkIfCardIsOpen()) {
+    buttonClickHandler();
+  }
+  selectRoomNumberChangeHandler();
+  var inactiveForm = document.querySelector('.ad-form');
+  inactiveForm.classList.add('ad-form--disabled');
+  var inactiveMap = document.querySelector('.map');
+  inactiveMap.classList.add('map--faded');
+}
+
+function resetInputData() {
+  var allInputs = document.querySelectorAll('input');
+  for (var i = 0; i < allInputs[i].length; i++) {
+    allInputs[i].value = '';
+  }
+}
