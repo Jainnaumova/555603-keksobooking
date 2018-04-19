@@ -1,5 +1,10 @@
 'use strict';
 
+var map = document.querySelector('.map');
+var pins = document.querySelector('.map__pins');
+var formFieldsets = document.querySelectorAll('fieldset');
+var adForm = document.querySelector('.ad-form');
+var inputHousePrice = document.querySelector('#price');
 // Массив данных для предложения
 var offerTitles = [
   'Большая уютная квартира',
@@ -90,8 +95,7 @@ var offers = getOffers();
 
 // Показать карту
 function getActiveMap() {
-  var activeMap = document.querySelector('.map');
-  activeMap.classList.remove('map--faded');
+  map.classList.remove('map--faded');
 }
 
 // Показать форму заполнения
@@ -102,7 +106,6 @@ function getActiveForm() {
 
 // Функция рандомного создания метки на карте
 function createPins(offersList) {
-  var pins = document.querySelector('.map__pins');
   var pinTemplate = document.querySelector('.map__pin');
   var pinFragment = document.createDocumentFragment();
   for (var i = 0; i < offersList.length; i++) {
@@ -119,7 +122,6 @@ function createPins(offersList) {
 }
 
 function deletePins() {
-  var pins = document.querySelector('.map__pins');
   var buttons = pins.querySelectorAll('button');
   for (var i = 1; i < buttons.length; i++) {
     pins.removeChild(buttons[i]);
@@ -139,7 +141,6 @@ function createMapCard(evt) {
     buttonClickHandler();
   }
   var singleOffer = offers[evt.target.id];
-  var map = document.querySelector('.map');
   var mapFiltersContainer = document.querySelector('.map__filters-container');
   var mapCardTemplate = document.querySelector('#card-template').content.querySelector('.map__card');
 
@@ -182,7 +183,6 @@ function createMapCard(evt) {
 // Фукнция закрытия карточки
 function buttonClickHandler() {
   window.removeEventListener('keydown', windowEscKeyDownHandler);
-  var map = document.querySelector('.map');
   var popup = document.querySelector('.popup');
   map.removeChild(popup);
 }
@@ -201,7 +201,6 @@ var KeyCodes = {
 };
 
 function getDisableFieldsets() {
-  var formFieldsets = document.querySelectorAll('fieldset');
   for (var i = 0; i < formFieldsets.length; i++) {
     formFieldsets[i].setAttribute('disabled', true);
   }
@@ -210,12 +209,10 @@ function getDisableFieldsets() {
 getDisableFieldsets();
 
 function getActiveFieldsets() {
-  var formFieldsets = document.querySelectorAll('fieldset');
   for (var i = 0; i < formFieldsets.length; i++) {
     formFieldsets[i].removeAttribute('disabled');
   }
 }
-
 
 mainPin.addEventListener('mouseup', mainPinMouseUpHandler);
 window.addEventListener('keydown', windowEnterKeyDownHandler);
@@ -252,19 +249,13 @@ function checkIfCardIsOpen() {
   return popup ? true : false;
 }
 
-var adForm = document.querySelector('.ad-form');
-
-
 var selectRoomNumber = adForm.elements.namedItem('rooms');
 selectRoomNumber.addEventListener('change', selectRoomNumberChangeHandler);
-
-var selectGuestNumber = adForm.elements.namedItem('capacity');
 
 var selectHouseType = document.querySelector('#type');
 selectHouseType.addEventListener('change', selectHouseTypeChangeHandler);
 
 function selectHouseTypeChangeHandler() {
-  var inputHousePrice = document.querySelector('#price');
   inputHousePrice.removeAttribute('placeholder');
   var newOptions;
   switch (selectHouseType.value) {
@@ -328,21 +319,6 @@ selectTimeOut.addEventListener('change', function (evt) {
   selectTimeIn.value = evt.currentTarget.value;
 });
 
-// ?????? есть ли необходимость оставить эту проверку??? Новый вариант Проверка правильности заполнения полей количество гостей и комнат
-function checkGuestAndRoomValidity() {
-  var roomNumber = selectRoomNumber.value;
-  var guestnumber = selectGuestNumber.value;
-  if (roomNumber < guestnumber) {
-    selectGuestNumber.setCustomValidity('Мало места для гостей!');
-  } else if (roomNumber === 100 & guestnumber !== 0) {
-    selectGuestNumber.setCustomValidity('Слишком много места не для гостей!');
-  } else {
-    selectGuestNumber.setCustomValidity('');
-  }
-}
-selectRoomNumber.addEventListener('change', checkGuestAndRoomValidity);
-selectGuestNumber.addEventListener('change', checkGuestAndRoomValidity);
-
 // Функция сброса данных при нажатии кнопки очистить
 var resetButton = document.querySelector('.ad-form__reset');
 resetButton.addEventListener('click', resetButtonClickHandler);
@@ -350,14 +326,14 @@ resetButton.addEventListener('click', resetButtonClickHandler);
 function resetButtonClickHandler() {
   deletePins();
   resetInputData();
+  resetInputPrice();
   if (checkIfCardIsOpen()) {
     buttonClickHandler();
   }
   selectRoomNumberChangeHandler();
-  var inactiveForm = document.querySelector('.ad-form');
-  inactiveForm.classList.add('ad-form--disabled');
-  var inactiveMap = document.querySelector('.map');
-  inactiveMap.classList.add('map--faded');
+  adForm.classList.add('ad-form--disabled');
+  map.classList.add('map--faded');
+  mainPin.addEventListener('mouseup', mainPinMouseUpHandler);
 }
 
 function resetInputData() {
@@ -365,4 +341,9 @@ function resetInputData() {
   for (var i = 0; i < allInputs[i].length; i++) {
     allInputs[i].value = '';
   }
+}
+
+function resetInputPrice() {
+  inputHousePrice.placeholder = '1000';
+  inputHousePrice.min = '0';
 }
