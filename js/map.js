@@ -1,5 +1,10 @@
 'use strict';
 
+var map = document.querySelector('.map');
+var pins = document.querySelector('.map__pins');
+var formFieldsets = document.querySelectorAll('fieldset');
+var adForm = document.querySelector('.ad-form');
+var inputHousePrice = document.querySelector('#price');
 // Массив данных для предложения
 var offerTitles = [
   'Большая уютная квартира',
@@ -90,8 +95,7 @@ var offers = getOffers();
 
 // Показать карту
 function getActiveMap() {
-  var activeMap = document.querySelector('.map');
-  activeMap.classList.remove('map--faded');
+  map.classList.remove('map--faded');
 }
 
 // Показать форму заполнения
@@ -102,7 +106,6 @@ function getActiveForm() {
 
 // Функция рандомного создания метки на карте
 function createPins(offersList) {
-  var pins = document.querySelector('.map__pins');
   var pinTemplate = document.querySelector('.map__pin');
   var pinFragment = document.createDocumentFragment();
   for (var i = 0; i < offersList.length; i++) {
@@ -118,6 +121,12 @@ function createPins(offersList) {
   pins.appendChild(pinFragment);
 }
 
+function deletePins() {
+  var buttons = pins.querySelectorAll('button');
+  for (var i = 1; i < buttons.length; i++) {
+    pins.removeChild(buttons[i]);
+  }
+}
 
 function removeChildren(list) {
   while (list.querySelector('li')) {
@@ -132,7 +141,6 @@ function createMapCard(evt) {
     buttonClickHandler();
   }
   var singleOffer = offers[evt.target.id];
-  var map = document.querySelector('.map');
   var mapFiltersContainer = document.querySelector('.map__filters-container');
   var mapCardTemplate = document.querySelector('#card-template').content.querySelector('.map__card');
 
@@ -175,7 +183,6 @@ function createMapCard(evt) {
 // Фукнция закрытия карточки
 function buttonClickHandler() {
   window.removeEventListener('keydown', windowEscKeyDownHandler);
-  var map = document.querySelector('.map');
   var popup = document.querySelector('.popup');
   map.removeChild(popup);
 }
@@ -194,7 +201,6 @@ var KeyCodes = {
 };
 
 function getDisableFieldsets() {
-  var formFieldsets = document.querySelectorAll('fieldset');
   for (var i = 0; i < formFieldsets.length; i++) {
     formFieldsets[i].setAttribute('disabled', true);
   }
@@ -203,22 +209,23 @@ function getDisableFieldsets() {
 getDisableFieldsets();
 
 function getActiveFieldsets() {
-  var formFieldsets = document.querySelectorAll('fieldset');
   for (var i = 0; i < formFieldsets.length; i++) {
     formFieldsets[i].removeAttribute('disabled');
   }
 }
 
-
 mainPin.addEventListener('mouseup', mainPinMouseUpHandler);
 window.addEventListener('keydown', windowEnterKeyDownHandler);
 
-// Фнукция активации формы
+// Функция активации формы
 function mainPinMouseUpHandler() {
   getActiveForm();
   getActiveFieldsets();
   getActiveMap();
   createPins(offers);
+
+  selectRoomNumberChangeHandler();
+  selectHouseTypeChangeHandler();
 
   mainPin.removeEventListener('mouseup', mainPinMouseUpHandler);
   window.removeEventListener('keydown', windowEnterKeyDownHandler);
@@ -240,4 +247,103 @@ function windowEscKeyDownHandler(evt) {
 function checkIfCardIsOpen() {
   var popup = document.querySelector('.popup');
   return popup ? true : false;
+}
+
+var selectRoomNumber = adForm.elements.namedItem('rooms');
+selectRoomNumber.addEventListener('change', selectRoomNumberChangeHandler);
+
+var selectHouseType = document.querySelector('#type');
+selectHouseType.addEventListener('change', selectHouseTypeChangeHandler);
+
+function selectHouseTypeChangeHandler() {
+  inputHousePrice.removeAttribute('placeholder');
+  var newOptions;
+  switch (selectHouseType.value) {
+    case 'bungalo':
+      newOptions = {placeholder: '0', min: '0'};
+      break;
+    case 'flat':
+      newOptions = {placeholder: '1000', min: '1000'};
+      break;
+    case 'house':
+      newOptions = {placeholder: '5000', min: '5000'};
+      break;
+    case 'palace':
+      newOptions = {placeholder: '10000', min: '10000'};
+      break;
+  }
+  inputHousePrice.setAttribute('placeholder', newOptions.placeholder);
+  inputHousePrice.setAttribute('min', newOptions.min);
+}
+
+function selectRoomNumberChangeHandler() {
+  var capacity = document.querySelector('#capacity');
+  var roomNumber = document.querySelector('#room_number');
+  var options = capacity.querySelectorAll('option');
+  for (var i = 0; i < options.length; i++) {
+    capacity.removeChild(options[i]);
+  }
+  var newOptions = [];
+  switch (roomNumber.value) {
+    case '1':
+      newOptions.push({value: '1', text: 'для 1 гостя'});
+      break;
+    case '2':
+      newOptions.push({value: '1', text: 'для 1 гостя'});
+      newOptions.push({value: '2', text: 'для 2 гостей'});
+      break;
+    case '3':
+      newOptions.push({value: '1', text: 'для 1 гостя'});
+      newOptions.push({value: '2', text: 'для 2 гостей'});
+      newOptions.push({value: '3', text: 'для 3 гостей'});
+      break;
+    case '100':
+      newOptions.push({value: '0', text: 'не для гостей'});
+      break;
+  }
+  for (var j = 0; j < newOptions.length; j++) {
+    var optionElement = document.createElement('option');
+    optionElement.setAttribute('value', newOptions[j].value);
+    optionElement.textContent = newOptions[j].text;
+    capacity.appendChild(optionElement);
+  }
+}
+
+// Синхронизация времени заезда и времени выезда
+var selectTimeIn = document.querySelector('#timein');
+var selectTimeOut = document.querySelector('#timeout');
+selectTimeIn.addEventListener('change', function (evt) {
+  selectTimeOut.value = evt.currentTarget.value;
+});
+selectTimeOut.addEventListener('change', function (evt) {
+  selectTimeIn.value = evt.currentTarget.value;
+});
+
+// Функция сброса данных при нажатии кнопки очистить
+var resetButton = document.querySelector('.ad-form__reset');
+resetButton.addEventListener('click', resetButtonClickHandler);
+
+function resetButtonClickHandler() {
+  deletePins();
+  resetInputData();
+  resetInputPrice();
+  if (checkIfCardIsOpen()) {
+    buttonClickHandler();
+  }
+  selectRoomNumberChangeHandler();
+  adForm.classList.add('ad-form--disabled');
+  map.classList.add('map--faded');
+  mainPin.addEventListener('mouseup', mainPinMouseUpHandler);
+}
+
+function resetInputData() {
+  var allInputs = document.querySelectorAll('input');
+  for (var i = 0; i < allInputs[i].length; i++) {
+    allInputs[i].value = '';
+  }
+}
+
+function resetInputPrice() {
+  inputHousePrice.placeholder = '1000';
+  inputHousePrice.min = '0';
 }
