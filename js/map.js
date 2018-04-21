@@ -5,6 +5,7 @@ var pins = document.querySelector('.map__pins');
 var formFieldsets = document.querySelectorAll('fieldset');
 var adForm = document.querySelector('.ad-form');
 var inputHousePrice = document.querySelector('#price');
+var mainPin = document.querySelector('.map__pin--main');
 // Массив данных для предложения
 var offerTitles = [
   'Большая уютная квартира',
@@ -26,6 +27,8 @@ var offerPhotos = [
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
 ];
+var initialPinX;
+var initialPinY;
 
 var typesDictionary = {
   palace: 'Дворец',
@@ -187,13 +190,12 @@ function buttonClickHandler() {
   map.removeChild(popup);
 }
 
-var mainPin = document.querySelector('.map__pin--main');
 var offsetLeft = mainPin.offsetLeft - 1;
 var offsetTop = mainPin.offsetTop;
-var PIN_CENTER_X = offsetLeft;
-var PIN_CENTER_Y = offsetTop;
+initialPinX = offsetLeft;
+initialPinY = offsetTop;
 var addressFieldset = document.querySelector('#address');
-addressFieldset.value = PIN_CENTER_X + ', ' + PIN_CENTER_Y;
+addressFieldset.value = initialPinX + ', ' + initialPinY;
 
 var KeyCodes = {
   ENTER: 13,
@@ -214,7 +216,12 @@ function getActiveFieldsets() {
   }
 }
 
-mainPin.addEventListener('mouseup', mainPinMouseUpHandler);
+function setInActiveFieldsets() {
+  for (var i = formFieldsets.length; i--;) {
+    formFieldsets[i].setAttribute('disabled', true);
+  }
+}
+
 window.addEventListener('keydown', windowEnterKeyDownHandler);
 
 // Функция активации формы
@@ -227,7 +234,6 @@ function mainPinMouseUpHandler() {
   selectRoomNumberChangeHandler();
   selectHouseTypeChangeHandler();
 
-  mainPin.removeEventListener('mouseup', mainPinMouseUpHandler);
   window.removeEventListener('keydown', windowEnterKeyDownHandler);
 }
 
@@ -327,18 +333,25 @@ function resetButtonClickHandler() {
   deletePins();
   resetInputData();
   resetInputPrice();
+  returnPinToInitialPosition();
+  setInActiveFieldsets();
   if (checkIfCardIsOpen()) {
     buttonClickHandler();
   }
   selectRoomNumberChangeHandler();
   adForm.classList.add('ad-form--disabled');
   map.classList.add('map--faded');
-  mainPin.addEventListener('mouseup', mainPinMouseUpHandler);
+}
+
+function returnPinToInitialPosition() {
+  mainPin.style.top = initialPinY + 'px';
+  mainPin.style.left = initialPinX + 'px';
 }
 
 function resetInputData() {
   var allInputs = document.querySelectorAll('input');
-  for (var i = 0; i < allInputs[i].length; i++) {
+  document.querySelector('textarea').value = '';
+  for (var i = allInputs.length; i--;) {
     allInputs[i].value = '';
   }
 }
@@ -347,3 +360,57 @@ function resetInputPrice() {
   inputHousePrice.placeholder = '1000';
   inputHousePrice.min = '0';
 }
+// Добавляем подвижности
+var BORDER_TOP_MAIN_PIN_FIELD = 150;
+var BORDER_RIGHT_MAIN_PIN_FIELD = 1150;
+var BORDER_BOTTOM_MAIN_PIN_FEILD = 500;
+var BORDER_LEFT_MAIN_PIN_FIELD = 0;
+
+var mainPinHandle = mainPin.querySelector('img');
+mainPinHandle.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  function mouseMoveHandler(moveEvt) {
+    moveEvt.preventDefault();
+
+    // Функция ограничитель движения пина
+    function restrictMainPinFieldMoving(pinCoords, min, max) {
+      return Math.max(min, Math.min(pinCoords, max));
+    }
+
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    var mainPinLeft = mainPin.offsetLeft - shift.x;
+    var mainPinTop = mainPin.offsetTop - shift.y;
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    mainPinLeft = restrictMainPinFieldMoving(mainPinLeft, BORDER_LEFT_MAIN_PIN_FIELD, BORDER_RIGHT_MAIN_PIN_FIELD);
+    mainPinTop = restrictMainPinFieldMoving(mainPinTop, BORDER_TOP_MAIN_PIN_FIELD, BORDER_BOTTOM_MAIN_PIN_FEILD);
+    mainPin.style.top = (mainPinTop) + 'px';
+    mainPin.style.left = (mainPinLeft) + 'px';
+    addressFieldset.value = (mainPinLeft) + ', ' + (mainPinTop);
+    mainPinHandle.addEventListener('mouseup', mainPinMouseUpHandler);
+  }
+
+  function mouseUpHandler(upEvt) {
+    upEvt.preventDefault();
+
+    document.removeEventListener('mousemove', mouseMoveHandler);
+    document.removeEventListener('mouseup', mouseUpHandler);
+  }
+
+  document.addEventListener('mousemove', mouseMoveHandler);
+  document.addEventListener('mouseup', mouseUpHandler);
+});
