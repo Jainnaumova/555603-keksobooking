@@ -5,6 +5,7 @@ var pins = document.querySelector('.map__pins');
 var formFieldsets = document.querySelectorAll('fieldset');
 var adForm = document.querySelector('.ad-form');
 var inputHousePrice = document.querySelector('#price');
+var mainPin = document.querySelector('.map__pin--main');
 // Массив данных для предложения
 var offerTitles = [
   'Большая уютная квартира',
@@ -26,6 +27,8 @@ var offerPhotos = [
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
 ];
+var initialPinX;
+var initialPinY;
 
 var typesDictionary = {
   palace: 'Дворец',
@@ -187,13 +190,12 @@ function buttonClickHandler() {
   map.removeChild(popup);
 }
 
-var mainPin = document.querySelector('.map__pin--main');
 var offsetLeft = mainPin.offsetLeft - 1;
 var offsetTop = mainPin.offsetTop;
-var PIN_CENTER_X = offsetLeft;
-var PIN_CENTER_Y = offsetTop;
+initialPinX = offsetLeft;
+initialPinY = offsetTop;
 var addressFieldset = document.querySelector('#address');
-addressFieldset.value = PIN_CENTER_X + ', ' + PIN_CENTER_Y;
+addressFieldset.value = initialPinX + ', ' + initialPinY;
 
 var KeyCodes = {
   ENTER: 13,
@@ -214,7 +216,12 @@ function getActiveFieldsets() {
   }
 }
 
-mainPin.addEventListener('mouseup', mainPinMouseUpHandler);
+function setInActiveFieldsets() {
+  for (var i = formFieldsets.length; i--;) {
+    formFieldsets[i].setAttribute('disabled', true);
+  }
+}
+
 window.addEventListener('keydown', windowEnterKeyDownHandler);
 
 // Функция активации формы
@@ -227,7 +234,6 @@ function mainPinMouseUpHandler() {
   selectRoomNumberChangeHandler();
   selectHouseTypeChangeHandler();
 
-  mainPin.removeEventListener('mouseup', mainPinMouseUpHandler);
   window.removeEventListener('keydown', windowEnterKeyDownHandler);
 }
 
@@ -327,18 +333,25 @@ function resetButtonClickHandler() {
   deletePins();
   resetInputData();
   resetInputPrice();
+  returnPinToInitialPosition();
+  setInActiveFieldsets();
   if (checkIfCardIsOpen()) {
     buttonClickHandler();
   }
   selectRoomNumberChangeHandler();
   adForm.classList.add('ad-form--disabled');
   map.classList.add('map--faded');
-  mainPin.addEventListener('mouseup', mainPinMouseUpHandler);
+}
+
+function returnPinToInitialPosition() {
+  mainPin.style.top = initialPinY + 'px';
+  mainPin.style.left = initialPinX + 'px';
 }
 
 function resetInputData() {
   var allInputs = document.querySelectorAll('input');
-  for (var i = 0; i < allInputs[i].length; i++) {
+  document.querySelector('textarea').value = '';
+  for (var i = allInputs.length; i--;) {
     allInputs[i].value = '';
   }
 }
@@ -387,7 +400,8 @@ mainPinHandle.addEventListener('mousedown', function (evt) {
     mainPinTop = restrictMainPinFieldMoving(mainPinTop, BORDER_TOP_MAIN_PIN_FIELD, BORDER_BOTTOM_MAIN_PIN_FEILD);
     mainPin.style.top = (mainPinTop) + 'px';
     mainPin.style.left = (mainPinLeft) + 'px';
-    addressFieldset.value = (mainPinLeft) + ' ,' + (mainPinTop);
+    addressFieldset.value = (mainPinLeft) + ', ' + (mainPinTop);
+    mainPinHandle.addEventListener('mouseup', mainPinMouseUpHandler);
   }
 
   function mouseUpHandler(upEvt) {
