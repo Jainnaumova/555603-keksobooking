@@ -31,39 +31,43 @@
     var randomNumber = window.utilFunc.getRandomInteger(1, array.length);
     return window.utilFunc.getShuffle(array).slice(0, randomNumber);
   }
+
   window.addEventListener('keydown', window.utilKeyCode.windowEnterKeyDownHandler);
-  window.data = {
-    getOffers: function () {
-      var offers = [];
-      for (var i = 0; i < offerTitles.length; i++) {
-        var x = window.utilFunc.getRandomInteger(300, 900);
-        var y = window.utilFunc.getRandomInteger(150, 500);
-        var obj = {
-          author: {
-            avatar: 'img/avatars/user0' + (i + 1) + '.png'
-          },
-          offer: {
-            title: offerTitles[i],
-            address: x + ', ' + y,
-            price: window.utilFunc.getRandomInteger(1000, 1000000),
-            type: window.utilFunc.getShuffle(offerTypes)[0],
-            rooms: window.utilFunc.getRandomInteger(1, 5),
-            guests: window.utilFunc.getRandomInteger(1, 10),
-            checkin: window.utilFunc.getShuffle(offerCheckInTimes)[0],
-            checkout: window.utilFunc.getShuffle(offerCheckOutTimes)[0],
-            features: getFeatures(offerFeatures),
-            description: '',
-            photos: window.utilFunc.getShuffle(offerPhotos)
-          },
-          location: {
-            x: x,
-            y: y
-          }
-        };
-        offers.push(obj);
-      }
-      return offers;
+
+  function getOffers() {
+    var offers = [];
+    for (var i = 0; i < offerTitles.length; i++) {
+      var x = window.utilFunc.getRandomInteger(300, 900);
+      var y = window.utilFunc.getRandomInteger(150, 500);
+      var obj = {
+        author: {
+          avatar: 'img/avatars/user0' + (i + 1) + '.png'
+        },
+        offer: {
+          title: offerTitles[i],
+          address: x + ', ' + y,
+          price: window.utilFunc.getRandomInteger(1000, 1000000),
+          type: window.utilFunc.getShuffle(offerTypes)[0],
+          rooms: window.utilFunc.getRandomInteger(1, 5),
+          guests: window.utilFunc.getRandomInteger(1, 10),
+          checkin: window.utilFunc.getShuffle(offerCheckInTimes)[0],
+          checkout: window.utilFunc.getShuffle(offerCheckOutTimes)[0],
+          features: getFeatures(offerFeatures),
+          description: '',
+          photos: window.utilFunc.getShuffle(offerPhotos)
+        },
+        location: {
+          x: x,
+          y: y
+        }
+      };
+      offers.push(obj);
     }
+    return offers;
+  }
+
+  window.data = {
+    getOffers: getOffers
   };
 
 })();

@@ -17,7 +17,7 @@
   resetButton.addEventListener('click', resetButtonClickHandler);
 
   function resetButtonClickHandler() {
-    window.pins.deletePins();
+    window.form.deletePins();
     resetInputData();
     resetInputPrice();
     getDisableFieldsets();
@@ -43,6 +43,7 @@
       allInputs[i].value = '';
     }
   }
+
   function getDisableFieldsets() {
     for (var i = 0; i < formFieldsets.length; i++) {
       formFieldsets[i].setAttribute('disabled', true);
