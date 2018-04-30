@@ -3,7 +3,36 @@
 (function () {
   var adForm = document.querySelector('.ad-form');
   var inputHousePrice = document.querySelector('#price');
-  var offers = window.data.getOffers();
+
+  function onError(message) {
+    var section = document.querySelector('.notice');
+    var newElement = document.createElement('div');
+    newElement.textContent = message;
+    newElement.classList.add('error-message');
+    section.appendChild(newElement);
+    setTimeout(function () {
+      section.removeChild(newElement);
+    }, 1500);
+  }
+
+  function onLoad(data) {
+    window.offers = data;
+  }
+
+  function hideSuccessMessage(element) {
+    setTimeout(function () {
+      element.classList.add('hidden');
+    }, 2000);
+  }
+
+  function postOnLoad() {
+    window.resetForm.resetButtonClickHandler();
+    var succesMessage = document.querySelector('.success');
+    succesMessage.classList.remove('hidden');
+    hideSuccessMessage(succesMessage);
+  }
+
+  window.backend.load(onLoad, onError);
   var pins = document.querySelector('.map__pins');
 
   function createPins(offersList) {
@@ -59,7 +88,7 @@
     window.utilFunc.setActiveForm();
     window.utilFunc.setActiveFieldsets();
     window.utilFunc.setActiveMap();
-    createPins(offers);
+    createPins(window.offers);
     selectRoomNumberChangeHandler();
     selectHouseTypeChangeHandler();
 
@@ -108,6 +137,22 @@
   });
   selectTimeOut.addEventListener('change', function (evt) {
     selectTimeIn.value = evt.currentTarget.value;
+  });
+
+  adForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var formData = new FormData();
+    formData.append('title', document.querySelector('#title').value);
+    formData.append('address', document.querySelector('#address').value);
+    formData.append('type', document.querySelector('#type').value);
+    formData.append('price', document.querySelector('#price').value);
+    formData.append('timein', document.querySelector('#timein').value);
+    formData.append('timeout', document.querySelector('#timeout').value);
+    formData.append('rooms', document.querySelector('#room_number').value);
+    formData.append('capacity', document.querySelector('#capacity').value);
+    formData.append('description', document.querySelector('#description').value);
+    // formData.append('images', document.querySelector('#images').file);
+    window.backend.send(formData, postOnLoad, onError);
   });
 
   window.form = {

@@ -56,4 +56,8 @@
     inputHousePrice.placeholder = '1000';
     inputHousePrice.min = '0';
   }
+
+  window.resetForm = {
+    resetButtonClickHandler: resetButtonClickHandler
+  };
 })();
