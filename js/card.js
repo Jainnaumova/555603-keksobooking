@@ -14,6 +14,7 @@
     if (window.utilFunc.checkIfCardIsOpen()) {
       window.utilKeyCode.buttonClickHandler();
     }
+
     var singleOffer = window.offers[evt.target.id];
     var mapFiltersContainer = document.querySelector('.map__filters-container');
     var mapCardTemplate = document.querySelector('#card-template').content.querySelector('.map__card');

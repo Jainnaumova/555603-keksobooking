@@ -1,40 +1,5 @@
 'use strict';
 
-// Массив данных для предложения
-
-// модуль вспомогательных функций util_func.js
-// Функция для получения рандомного числа из двух крайних
-
-
-// модуль вспомогательных функций util_func.js
-
-// модуль, который создаёт данные; data.js
-
-// модуль, который создаёт данные;
-
-// Показать карту
-
-
-// Показать форму заполнения
-
-// модуль, который отвечает за создание пина — метки на карте pin.js
-// Функция рандомного создания метки на карте
-
-// модуль, который отвечает за создание пина — метки на карте
-
-// модуль, который отвечает за создание карточки объявлений; card.js
-
-// модуль, который отвечает за создание карточки объявлений;
-
-
-// модуль, который работает с формой объявления; form.js
-// Функция активации формы
-
-// модуль, который работает с формой объявления;
-
-// Функция сброса данных при нажатии кнопки очистить
-
-
 // Добавляем подвижности
 (function () {
   var mainPin = document.querySelector('.map__pin--main');
@@ -44,8 +9,7 @@
   var BORDER_BOTTOM_MAIN_PIN_FEILD = 500;
   var BORDER_LEFT_MAIN_PIN_FIELD = 0;
 
-  var mainPinHandle = mainPin.querySelector('img');
-  mainPinHandle.addEventListener('mousedown', function (evt) {
+  mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
 
     var startCoords = {
@@ -79,7 +43,7 @@
       mainPin.style.top = (mainPinTop) + 'px';
       mainPin.style.left = (mainPinLeft) + 'px';
       addressFieldset.value = (mainPinLeft) + ', ' + (mainPinTop);
-      mainPinHandle.addEventListener('mouseup', window.form.mainPinMouseUpHandler);
+      mainPin.addEventListener('mouseup', window.form.mainPinMouseUpHandler);
     }
 
     function mouseUpHandler(upEvt) {

@@ -5,13 +5,13 @@
   var inputHousePrice = document.querySelector('#price');
 
   function onError(message) {
-    var section = document.querySelector('.notice');
+    var promo = document.querySelector('.promo');
     var newElement = document.createElement('div');
     newElement.textContent = message;
     newElement.classList.add('error-message');
-    section.appendChild(newElement);
+    promo.appendChild(newElement);
     setTimeout(function () {
-      section.removeChild(newElement);
+      promo.removeChild(newElement);
     }, 1500);
   }
 
@@ -43,7 +43,8 @@
       template.style = 'left: ' + (offersList[i].location.x - 25) + 'px; top: ' + (offersList[i].location.y - 70) + 'px';
       template.querySelector('img').src = offersList[i].author.avatar;
       template.querySelector('img').setAttribute('id', i);
-      template.addEventListener('click', function () {
+      template.setAttribute('id', i);
+      template.addEventListener('click', function (event) {
         window.card.createMapCard(event);
       }, false);
       pinFragment.appendChild(template);
@@ -88,7 +89,9 @@
     window.utilFunc.setActiveForm();
     window.utilFunc.setActiveFieldsets();
     window.utilFunc.setActiveMap();
-    createPins(window.offers);
+    if (onLoad) {
+      createPins(window.offers);
+    }
     selectRoomNumberChangeHandler();
     selectHouseTypeChangeHandler();
 
@@ -141,17 +144,8 @@
 
   adForm.addEventListener('submit', function (event) {
     event.preventDefault();
-    var formData = new FormData();
-    formData.append('title', document.querySelector('#title').value);
-    formData.append('address', document.querySelector('#address').value);
-    formData.append('type', document.querySelector('#type').value);
-    formData.append('price', document.querySelector('#price').value);
-    formData.append('timein', document.querySelector('#timein').value);
-    formData.append('timeout', document.querySelector('#timeout').value);
-    formData.append('rooms', document.querySelector('#room_number').value);
-    formData.append('capacity', document.querySelector('#capacity').value);
-    formData.append('description', document.querySelector('#description').value);
-    // formData.append('images', document.querySelector('#images').file);
+    var formData = new FormData(adForm);
+
     window.backend.send(formData, postOnLoad, onError);
   });
 
