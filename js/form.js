@@ -3,7 +3,36 @@
 (function () {
   var adForm = document.querySelector('.ad-form');
   var inputHousePrice = document.querySelector('#price');
-  var offers = window.data.getOffers();
+
+  function onError(message) {
+    var promo = document.querySelector('.promo');
+    var newElement = document.createElement('div');
+    newElement.textContent = message;
+    newElement.classList.add('error-message');
+    promo.appendChild(newElement);
+    setTimeout(function () {
+      promo.removeChild(newElement);
+    }, 1500);
+  }
+
+  function onLoad(data) {
+    window.offers = data;
+  }
+
+  function hideSuccessMessage(element) {
+    setTimeout(function () {
+      element.classList.add('hidden');
+    }, 2000);
+  }
+
+  function postOnLoad() {
+    window.resetForm.resetButtonClickHandler();
+    var succesMessage = document.querySelector('.success');
+    succesMessage.classList.remove('hidden');
+    hideSuccessMessage(succesMessage);
+  }
+
+  window.backend.load(onLoad, onError);
   var pins = document.querySelector('.map__pins');
 
   function createPins(offersList) {
@@ -14,7 +43,8 @@
       template.style = 'left: ' + (offersList[i].location.x - 25) + 'px; top: ' + (offersList[i].location.y - 70) + 'px';
       template.querySelector('img').src = offersList[i].author.avatar;
       template.querySelector('img').setAttribute('id', i);
-      template.addEventListener('click', function () {
+      template.setAttribute('id', i);
+      template.addEventListener('click', function (event) {
         window.card.createMapCard(event);
       }, false);
       pinFragment.appendChild(template);
@@ -59,7 +89,9 @@
     window.utilFunc.setActiveForm();
     window.utilFunc.setActiveFieldsets();
     window.utilFunc.setActiveMap();
-    createPins(offers);
+    if (onLoad) {
+      createPins(window.offers);
+    }
     selectRoomNumberChangeHandler();
     selectHouseTypeChangeHandler();
 
@@ -108,6 +140,13 @@
   });
   selectTimeOut.addEventListener('change', function (evt) {
     selectTimeIn.value = evt.currentTarget.value;
+  });
+
+  adForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var formData = new FormData(adForm);
+
+    window.backend.send(formData, postOnLoad, onError);
   });
 
   window.form = {

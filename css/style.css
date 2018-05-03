@@ -1213,3 +1213,14 @@ fieldset {
       -ms-transform: translateX(-50%);
           transform: translateX(-50%);
 }
+
+.error-message {
+  position: absolute;
+  width: auto;
+  z-index: 100;
+  font-size: 50px;
+  font-weight: 700;
+  color: red;
+  text-align: center;
+
+}
