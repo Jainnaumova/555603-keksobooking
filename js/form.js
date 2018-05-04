@@ -3,6 +3,9 @@
 (function () {
   var adForm = document.querySelector('.ad-form');
   var inputHousePrice = document.querySelector('#price');
+  var PIN_LIMIT = 5;
+  var SIZE_X = 25;
+  var SIZE_Y = 70;
 
   function onError(message) {
     var promo = document.querySelector('.promo');
@@ -38,9 +41,9 @@
   function createPins(offersList) {
     var pinTemplate = document.querySelector('.map__pin');
     var pinFragment = document.createDocumentFragment();
-    for (var i = 0; i < offersList.length; i++) {
+    for (var i = 0; i < offersList.length && i < PIN_LIMIT; i++) {
       var template = pinTemplate.cloneNode(true);
-      template.style = 'left: ' + (offersList[i].location.x - 25) + 'px; top: ' + (offersList[i].location.y - 70) + 'px';
+      template.style = 'left: ' + (offersList[i].location.x - SIZE_X) + 'px; top: ' + (offersList[i].location.y - SIZE_Y) + 'px';
       template.querySelector('img').src = offersList[i].author.avatar;
       template.querySelector('img').setAttribute('id', i);
       template.setAttribute('id', i);
@@ -50,6 +53,59 @@
       pinFragment.appendChild(template);
     }
     pins.appendChild(pinFragment);
+  }
+
+  function checkPrice(price, priceType) {
+    switch (priceType) {
+      case 'low':
+        if (price < 10000) {
+          return true;
+        }
+        break;
+      case 'middle':
+        if (price >= 10000 && price < 50000) {
+          return true;
+        }
+        break;
+      case 'high':
+        if (price >= 50000) {
+          return true;
+        }
+        break;
+      default:
+        return false;
+    }
+    return false;
+  }
+
+  function theFilter(singleOffer) {
+    var filterSelectors = document.querySelector('.map__filters');
+    return (
+      (filterSelectors[0].value === 'any' ? singleOffer : singleOffer.offer.type === filterSelectors[0].value) &&
+      (filterSelectors[1].value === 'any' ? singleOffer : checkPrice(singleOffer.offer.price, filterSelectors[1].value)) &&
+      (filterSelectors[2].value === 'any' ? singleOffer : singleOffer.offer.rooms === +filterSelectors[2].value) &&
+      (filterSelectors[3].value === 'any' ? singleOffer : singleOffer.offer.guests === +filterSelectors[3].value) &&
+      filterCheckboxes(singleOffer)
+    );
+  }
+
+  function filterCheckboxes(singleOffer) {
+    var featureCheckBoxes = document.querySelector('.map__filters').querySelectorAll('input[type=checkbox]:checked');
+    var filtered = true;
+    if (featureCheckBoxes.length) {
+      featureCheckBoxes.forEach(function (chBox) {
+        if (!singleOffer.offer.features.includes(chBox.value)) {
+          filtered = false;
+        }
+      });
+    }
+    return filtered;
+  }
+
+  function filterOffers() {
+    var filteredOffers = window.offers.filter(theFilter);
+    deletePins();
+    createPins(filteredOffers);
   }
 
   function selectRoomNumberChangeHandler() {
@@ -90,7 +146,7 @@
     window.utilFunc.setActiveFieldsets();
     window.utilFunc.setActiveMap();
     if (onLoad) {
-      createPins(window.offers);
+      filterOffers();
     }
     selectRoomNumberChangeHandler();
     selectHouseTypeChangeHandler();
@@ -152,7 +208,9 @@
   window.form = {
     selectRoomNumberChangeHandler: selectRoomNumberChangeHandler,
     mainPinMouseUpHandler: mainPinMouseUpHandler,
-    deletePins: deletePins
+    deletePins: deletePins,
+    filterOffers: filterOffers,
+    createPins: createPins
   };
 
 })();

@@ -38,9 +38,15 @@
 
   function resetInputData() {
     var allInputs = document.querySelectorAll('input');
+    var checkboxInputs = allInputs.type('checkbox');
+    // document.querySelector('checked').type = false;
+    for (var i = checkboxInputs.length; i--;) {
+      checkboxInputs[i].setAttribute('unchecked', true);
+    }
+
     document.querySelector('textarea').value = '';
-    for (var i = allInputs.length; i--;) {
-      allInputs[i].value = '';
+    for (var j = allInputs.length; j--;) {
+      allInputs[j].value = '';
     }
   }
 
