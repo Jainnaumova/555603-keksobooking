@@ -15,7 +15,9 @@
       window.utilKeyCode.buttonClickHandler();
     }
 
-    var singleOffer = window.offers[evt.target.id];
+    var singleOffer = window.offers.filter(function (offer) {
+      return offer.id === +evt.target.id;
+    })[0];
     var mapFiltersContainer = document.querySelector('.map__filters-container');
     var mapCardTemplate = document.querySelector('#card-template').content.querySelector('.map__card');
 

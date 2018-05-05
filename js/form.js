@@ -19,8 +19,23 @@
   }
 
   function onLoad(data) {
+    for (var i = data.length; i--;) {
+      data[i].id = i + 1;
+    }
     window.offers = data;
   }
+
+  // function disableFilters() {
+  //   var filtersContainer = document.querySelector('.map__filters');
+  //   var filterSelectors = filtersContainer.querySelectorAll('select');
+  //   for (var i = filterSelectors.length; i--;) {
+  //     filterSelectors[i].disabled = true;
+  //   }
+  //   var filtersCheckboxes = filtersContainer.querySelectorAll('input[type=checkbox]');
+  //   for (var j = filtersCheckboxes.length; j--;) {
+  //     filtersCheckboxes[j].disabled = true;
+  //   }
+  // }
 
   function hideSuccessMessage(element) {
     setTimeout(function () {
@@ -45,67 +60,14 @@
       var template = pinTemplate.cloneNode(true);
       template.style = 'left: ' + (offersList[i].location.x - SIZE_X) + 'px; top: ' + (offersList[i].location.y - SIZE_Y) + 'px';
       template.querySelector('img').src = offersList[i].author.avatar;
-      template.querySelector('img').setAttribute('id', i);
-      template.setAttribute('id', i);
+      template.querySelector('img').setAttribute('id', offersList[i].id);
+      template.setAttribute('id', offersList[i].id);
       template.addEventListener('click', function (event) {
         window.card.createMapCard(event);
       }, false);
       pinFragment.appendChild(template);
     }
     pins.appendChild(pinFragment);
-  }
-
-  function checkPrice(price, priceType) {
-    switch (priceType) {
-      case 'low':
-        if (price < 10000) {
-          return true;
-        }
-        break;
-      case 'middle':
-        if (price >= 10000 && price < 50000) {
-          return true;
-        }
-        break;
-      case 'high':
-        if (price >= 50000) {
-          return true;
-        }
-        break;
-      default:
-        return false;
-    }
-    return false;
-  }
-
-  function theFilter(singleOffer) {
-    var filterSelectors = document.querySelector('.map__filters');
-    return (
-      (filterSelectors[0].value === 'any' ? singleOffer : singleOffer.offer.type === filterSelectors[0].value) &&
-      (filterSelectors[1].value === 'any' ? singleOffer : checkPrice(singleOffer.offer.price, filterSelectors[1].value)) &&
-      (filterSelectors[2].value === 'any' ? singleOffer : singleOffer.offer.rooms === +filterSelectors[2].value) &&
-      (filterSelectors[3].value === 'any' ? singleOffer : singleOffer.offer.guests === +filterSelectors[3].value) &&
-      filterCheckboxes(singleOffer)
-    );
-  }
-
-  function filterCheckboxes(singleOffer) {
-    var featureCheckBoxes = document.querySelector('.map__filters').querySelectorAll('input[type=checkbox]:checked');
-    var filtered = true;
-    if (featureCheckBoxes.length) {
-      featureCheckBoxes.forEach(function (chBox) {
-        if (!singleOffer.offer.features.includes(chBox.value)) {
-          filtered = false;
-        }
-      });
-    }
-    return filtered;
-  }
-
-  function filterOffers() {
-    var filteredOffers = window.offers.filter(theFilter);
-    deletePins();
-    createPins(filteredOffers);
   }
 
   function selectRoomNumberChangeHandler() {
@@ -146,10 +108,14 @@
     window.utilFunc.setActiveFieldsets();
     window.utilFunc.setActiveMap();
     if (onLoad) {
-      filterOffers();
+      window.filters.filterOffers();
     }
     selectRoomNumberChangeHandler();
     selectHouseTypeChangeHandler();
+    var filtersContainer = document.querySelector('.map__filters');
+    filtersContainer.addEventListener('change', function () {
+      window.debounce(window.filters.filterOffers);
+    });
 
     window.removeEventListener('keydown', window.utilKeyCode.windowEnterKeyDownHandler);
   }
@@ -209,7 +175,6 @@
     selectRoomNumberChangeHandler: selectRoomNumberChangeHandler,
     mainPinMouseUpHandler: mainPinMouseUpHandler,
     deletePins: deletePins,
-    filterOffers: filterOffers,
     createPins: createPins
   };
 
