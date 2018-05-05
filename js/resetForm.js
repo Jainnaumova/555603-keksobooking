@@ -29,6 +29,7 @@
     window.form.selectRoomNumberChangeHandler();
     adForm.classList.add('ad-form--disabled');
     map.classList.add('map--faded');
+    addressFieldset.value = initialPinX + ', ' + initialPinY;
   }
 
   function returnPinToInitialPosition() {
@@ -38,10 +39,19 @@
 
   function resetInputData() {
     var allInputs = document.querySelectorAll('input');
+
     document.querySelector('textarea').value = '';
-    for (var i = allInputs.length; i--;) {
-      allInputs[i].value = '';
+    for (var j = allInputs.length; j--;) {
+      allInputs[j].value = '';
     }
+    var checkboxInputs = document.querySelectorAll('input[type=checkbox]');
+    for (var i = checkboxInputs.length; i--;) {
+      if (checkboxInputs[i].checked) {
+        checkboxInputs[i].checked = false;
+      }
+      checkboxInputs[i].value = checkboxInputs[i].id.split('-')[1];
+    }
+
   }
 
   function getDisableFieldsets() {

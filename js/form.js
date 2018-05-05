@@ -3,6 +3,9 @@
 (function () {
   var adForm = document.querySelector('.ad-form');
   var inputHousePrice = document.querySelector('#price');
+  var PIN_LIMIT = 5;
+  var SIZE_X = 25;
+  var SIZE_Y = 70;
 
   function onError(message) {
     var promo = document.querySelector('.promo');
@@ -16,8 +19,23 @@
   }
 
   function onLoad(data) {
+    for (var i = data.length; i--;) {
+      data[i].id = i + 1;
+    }
     window.offers = data;
   }
+
+  // function disableFilters() {
+  //   var filtersContainer = document.querySelector('.map__filters');
+  //   var filterSelectors = filtersContainer.querySelectorAll('select');
+  //   for (var i = filterSelectors.length; i--;) {
+  //     filterSelectors[i].disabled = true;
+  //   }
+  //   var filtersCheckboxes = filtersContainer.querySelectorAll('input[type=checkbox]');
+  //   for (var j = filtersCheckboxes.length; j--;) {
+  //     filtersCheckboxes[j].disabled = true;
+  //   }
+  // }
 
   function hideSuccessMessage(element) {
     setTimeout(function () {
@@ -38,12 +56,12 @@
   function createPins(offersList) {
     var pinTemplate = document.querySelector('.map__pin');
     var pinFragment = document.createDocumentFragment();
-    for (var i = 0; i < offersList.length; i++) {
+    for (var i = 0; i < offersList.length && i < PIN_LIMIT; i++) {
       var template = pinTemplate.cloneNode(true);
-      template.style = 'left: ' + (offersList[i].location.x - 25) + 'px; top: ' + (offersList[i].location.y - 70) + 'px';
+      template.style = 'left: ' + (offersList[i].location.x - SIZE_X) + 'px; top: ' + (offersList[i].location.y - SIZE_Y) + 'px';
       template.querySelector('img').src = offersList[i].author.avatar;
-      template.querySelector('img').setAttribute('id', i);
-      template.setAttribute('id', i);
+      template.querySelector('img').setAttribute('id', offersList[i].id);
+      template.setAttribute('id', offersList[i].id);
       template.addEventListener('click', function (event) {
         window.card.createMapCard(event);
       }, false);
@@ -90,10 +108,14 @@
     window.utilFunc.setActiveFieldsets();
     window.utilFunc.setActiveMap();
     if (onLoad) {
-      createPins(window.offers);
+      window.filters.filterOffers();
     }
     selectRoomNumberChangeHandler();
     selectHouseTypeChangeHandler();
+    var filtersContainer = document.querySelector('.map__filters');
+    filtersContainer.addEventListener('change', function () {
+      window.debounce(window.filters.filterOffers);
+    });
 
     window.removeEventListener('keydown', window.utilKeyCode.windowEnterKeyDownHandler);
   }
@@ -152,7 +174,8 @@
   window.form = {
     selectRoomNumberChangeHandler: selectRoomNumberChangeHandler,
     mainPinMouseUpHandler: mainPinMouseUpHandler,
-    deletePins: deletePins
+    deletePins: deletePins,
+    createPins: createPins
   };
 
 })();
