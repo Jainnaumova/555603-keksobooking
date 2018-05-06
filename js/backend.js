@@ -5,6 +5,8 @@
   var LOAD_WRONG_REQUEST = 400;
   var LOAD_NOT_FOUND = 404;
   var LOAD_TIMEOUT = 10000;
+  var GET_URL = 'https://js.dump.academy/keksobooking/data';
+  var POST_URL = 'https://js.dump.academy/keksobooking';
 
   function loadData(onLoad, onError) {
     var xhr = new XMLHttpRequest();
@@ -49,12 +51,12 @@
   window.backend = {
     load: function (onLoad, onError) {
       var xhr = loadData(onLoad, onError);
-      xhr.open('GET', 'https://js.dump.academy/keksobooking/data');
+      xhr.open('GET', GET_URL);
       xhr.send();
     },
     send: function (data, onLoad, onError) {
       var xhr = loadData(onLoad, onError);
-      xhr.open('POST', 'https://js.dump.academy/keksobooking');
+      xhr.open('POST', POST_URL);
       xhr.send(data);
     }
   };

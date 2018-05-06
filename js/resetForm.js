@@ -1,6 +1,9 @@
 'use strict';
 
 (function () {
+
+  var RESET_PLH = 1000;
+  var RESET_MIN = 0;
   var map = document.querySelector('.map');
   var adForm = document.querySelector('.ad-form');
   var mainPin = document.querySelector('.map__pin--main');
@@ -39,6 +42,13 @@
 
   function resetInputData() {
     var allInputs = document.querySelectorAll('input');
+    var selectors = document.querySelectorAll('select');
+
+    if (window.selectorsInitialValues.length) {
+      for (var k = 0; k < selectors.length; k++) {
+        selectors[k].value = window.selectorsInitialValues[k];
+      }
+    }
 
     document.querySelector('textarea').value = '';
     for (var j = allInputs.length; j--;) {
@@ -63,11 +73,12 @@
   var inputHousePrice = document.querySelector('#price');
 
   function resetInputPrice() {
-    inputHousePrice.placeholder = '1000';
-    inputHousePrice.min = '0';
+    inputHousePrice.placeholder = RESET_PLH;
+    inputHousePrice.min = RESET_MIN;
   }
 
   window.resetForm = {
-    resetButtonClickHandler: resetButtonClickHandler
+    resetButtonClickHandler: resetButtonClickHandler,
+    getDisableFieldsets: getDisableFieldsets
   };
 })();

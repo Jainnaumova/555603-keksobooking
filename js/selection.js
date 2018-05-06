@@ -3,20 +3,23 @@
 
 (function () {
 
+  var MIN_HIGH_PRICE = 50000;
+  var MAX_MIN_PRICE = 10000;
+  var OPTION_ANY = 'any';
   function checkPrice(price, priceType) {
     switch (priceType) {
       case 'low':
-        if (price < 10000) {
+        if (price < MAX_MIN_PRICE) {
           return true;
         }
         break;
       case 'middle':
-        if (price >= 10000 && price < 50000) {
+        if (price >= MAX_MIN_PRICE && price < MIN_HIGH_PRICE) {
           return true;
         }
         break;
       case 'high':
-        if (price >= 50000) {
+        if (price >= MIN_HIGH_PRICE) {
           return true;
         }
         break;
@@ -32,10 +35,10 @@
     }
     var filterSelectors = document.querySelector('.map__filters');
     return (
-      (filterSelectors[0].value === 'any' ? singleOffer : singleOffer.offer.type === filterSelectors[0].value) &&
-      (filterSelectors[1].value === 'any' ? singleOffer : checkPrice(singleOffer.offer.price, filterSelectors[1].value)) &&
-      (filterSelectors[2].value === 'any' ? singleOffer : singleOffer.offer.rooms === +filterSelectors[2].value) &&
-      (filterSelectors[3].value === 'any' ? singleOffer : singleOffer.offer.guests === +filterSelectors[3].value) &&
+      (filterSelectors[0].value === OPTION_ANY ? singleOffer : singleOffer.offer.type === filterSelectors[0].value) &&
+      (filterSelectors[1].value === OPTION_ANY ? singleOffer : checkPrice(singleOffer.offer.price, filterSelectors[1].value)) &&
+      (filterSelectors[2].value === OPTION_ANY ? singleOffer : singleOffer.offer.rooms === +filterSelectors[2].value) &&
+      (filterSelectors[3].value === OPTION_ANY ? singleOffer : singleOffer.offer.guests === +filterSelectors[3].value) &&
       filterCheckboxes(singleOffer)
     );
   }
@@ -59,7 +62,7 @@
     window.form.createPins(filteredOffers);
   }
 
-  window.filters = {
+  window.selection = {
     filterOffers: filterOffers
   };
 

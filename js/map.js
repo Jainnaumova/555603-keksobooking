@@ -1,7 +1,7 @@
 'use strict';
 
-// Добавляем подвижности
 (function () {
+
   var mainPin = document.querySelector('.map__pin--main');
   var addressFieldset = document.querySelector('#address');
   var BORDER_TOP_MAIN_PIN_FIELD = 150;
@@ -20,7 +20,6 @@
     function mouseMoveHandler(moveEvt) {
       moveEvt.preventDefault();
 
-      // Функция ограничитель движения пина
       function restrictMainPinFieldMoving(pinCoords, min, max) {
         return Math.max(min, Math.min(pinCoords, max));
       }
