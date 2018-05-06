@@ -2,12 +2,12 @@
 
 (function () {
 
-  var mainPin = document.querySelector('.map__pin--main');
-  var addressFieldset = document.querySelector('#address');
   var BORDER_TOP_MAIN_PIN_FIELD = 150;
   var BORDER_RIGHT_MAIN_PIN_FIELD = 1150;
   var BORDER_BOTTOM_MAIN_PIN_FEILD = 500;
   var BORDER_LEFT_MAIN_PIN_FIELD = 0;
+  var mainPin = document.querySelector('.map__pin--main');
+  var addressFieldset = document.querySelector('#address');
 
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
