@@ -1,12 +1,12 @@
 'use strict';
 
 (function () {
+
   var KeyCodes = {
     ENTER: 13,
     ESC: 27
   };
   var map = document.querySelector('.map');
-  // Функция закрытия карточки
 
   function buttonClickHandler() {
     window.removeEventListener('keydown', windowEscKeyDownHandler);

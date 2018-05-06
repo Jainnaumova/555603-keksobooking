@@ -1,8 +1,11 @@
 'use strict';
 
 (function () {
+
+  var LAST_SELECTOR = 8;
   var formFieldsets = document.querySelectorAll('fieldset');
   var map = document.querySelector('.map');
+  window.selectorsInitialValues = [];
 
   function getRandomInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -31,6 +34,11 @@
     var activeForm = document.querySelector('.ad-form--disabled');
     if (activeForm) {
       activeForm.classList.remove('ad-form--disabled');
+    }
+    var selectors = document.querySelectorAll('select');
+    for (var i = 0; i < selectors.length; i++) {
+      var initValue = i !== LAST_SELECTOR ? selectors[i].options[0].value : '';
+      window.selectorsInitialValues.push(initValue);
     }
   }
 

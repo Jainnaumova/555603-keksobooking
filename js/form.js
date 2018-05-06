@@ -1,11 +1,18 @@
 'use strict';
 
 (function () {
-  var adForm = document.querySelector('.ad-form');
-  var inputHousePrice = document.querySelector('#price');
+
   var PIN_LIMIT = 5;
   var SIZE_X = 25;
   var SIZE_Y = 70;
+  var ON_ERROR_TIMEOUT = 1500;
+  var SUCCESS_MESSAGE_TIMEOUT = 2000;
+  var BUNGALO_PLH = 0;
+  var FLAT_PLH = 1000;
+  var HOUSE_PLH = 5000;
+  var PALACE_PLH = 10000;
+  var adForm = document.querySelector('.ad-form');
+  var inputHousePrice = document.querySelector('#price');
 
   function onError(message) {
     var promo = document.querySelector('.promo');
@@ -15,32 +22,21 @@
     promo.appendChild(newElement);
     setTimeout(function () {
       promo.removeChild(newElement);
-    }, 1500);
+    }, ON_ERROR_TIMEOUT);
   }
 
   function onLoad(data) {
+    window.resetForm.resetButtonClickHandler();
     for (var i = data.length; i--;) {
       data[i].id = i + 1;
     }
     window.offers = data;
   }
 
-  // function disableFilters() {
-  //   var filtersContainer = document.querySelector('.map__filters');
-  //   var filterSelectors = filtersContainer.querySelectorAll('select');
-  //   for (var i = filterSelectors.length; i--;) {
-  //     filterSelectors[i].disabled = true;
-  //   }
-  //   var filtersCheckboxes = filtersContainer.querySelectorAll('input[type=checkbox]');
-  //   for (var j = filtersCheckboxes.length; j--;) {
-  //     filtersCheckboxes[j].disabled = true;
-  //   }
-  // }
-
   function hideSuccessMessage(element) {
     setTimeout(function () {
       element.classList.add('hidden');
-    }, 2000);
+    }, SUCCESS_MESSAGE_TIMEOUT);
   }
 
   function postOnLoad() {
@@ -63,7 +59,7 @@
       template.querySelector('img').setAttribute('id', offersList[i].id);
       template.setAttribute('id', offersList[i].id);
       template.addEventListener('click', function (event) {
-        window.card.createMapCard(event);
+        window.card.createPinOffer(event);
       }, false);
       pinFragment.appendChild(template);
     }
@@ -95,12 +91,15 @@
         newOptions.push({value: '0', text: 'не для гостей'});
         break;
     }
+
+    var capacityFragment = document.createDocumentFragment();
     for (var j = 0; j < newOptions.length; j++) {
       var optionElement = document.createElement('option');
       optionElement.setAttribute('value', newOptions[j].value);
       optionElement.textContent = newOptions[j].text;
-      capacity.appendChild(optionElement);
+      capacityFragment.appendChild(optionElement);
     }
+    capacity.appendChild(capacityFragment);
   }
 
   function mainPinMouseUpHandler() {
@@ -108,13 +107,13 @@
     window.utilFunc.setActiveFieldsets();
     window.utilFunc.setActiveMap();
     if (onLoad) {
-      window.filters.filterOffers();
+      window.selection.filterOffers();
     }
     selectRoomNumberChangeHandler();
     selectHouseTypeChangeHandler();
     var filtersContainer = document.querySelector('.map__filters');
     filtersContainer.addEventListener('change', function () {
-      window.debounce(window.filters.filterOffers);
+      window.debounce(window.selection.filterOffers);
     });
 
     window.removeEventListener('keydown', window.utilKeyCode.windowEnterKeyDownHandler);
@@ -138,23 +137,24 @@
     var newOptions;
     switch (selectHouseType.value) {
       case 'bungalo':
-        newOptions = {placeholder: '0', min: '0'};
+        newOptions = {placeholder: BUNGALO_PLH, min: BUNGALO_PLH};
         break;
       case 'flat':
-        newOptions = {placeholder: '1000', min: '1000'};
+        newOptions = {placeholder: FLAT_PLH, min: FLAT_PLH};
         break;
       case 'house':
-        newOptions = {placeholder: '5000', min: '5000'};
+        newOptions = {placeholder: HOUSE_PLH, min: HOUSE_PLH};
         break;
       case 'palace':
-        newOptions = {placeholder: '10000', min: '10000'};
+        newOptions = {placeholder: PALACE_PLH, min: PALACE_PLH};
         break;
+      default:
+        return;
     }
     inputHousePrice.setAttribute('placeholder', newOptions.placeholder);
     inputHousePrice.setAttribute('min', newOptions.min);
   }
 
-  // Синхронизация времени заезда и времени выезда
   var selectTimeIn = document.querySelector('#timein');
   var selectTimeOut = document.querySelector('#timeout');
   selectTimeIn.addEventListener('change', function (evt) {
