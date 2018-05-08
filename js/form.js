@@ -7,10 +7,36 @@
   var SIZE_Y = 70;
   var ON_ERROR_TIMEOUT = 1500;
   var SUCCESS_MESSAGE_TIMEOUT = 2000;
-  var BUNGALO_PLH = 0;
-  var FLAT_PLH = 1000;
-  var HOUSE_PLH = 5000;
-  var PALACE_PLH = 10000;
+  var Room = {
+    NUMBER_1: '1',
+    NUMBER_2: '2',
+    NUMBER_3: '3',
+    NUMBER_100: '100'
+  };
+  var RoomSize = {
+    VALUE_0: '0',
+    VALUE_1: '1',
+    VALUE_2: '2',
+    VALUE_3: '3'
+  };
+  var RoomCapacity = {
+    TEXT_0: 'не для гостей',
+    TEXT_1: 'для 1 гостя',
+    TEXT_2: 'для 2 гостей',
+    TEXT_3: 'для 3 гостей'
+  };
+  var HouseType = {
+    BUNGALO: 'bungalo',
+    FLAT: 'flat',
+    HOUSE: 'house',
+    PALACE: 'palace'
+  };
+  var PlaceholderValue = {
+    BUNGALO: 0,
+    FLAT: 1000,
+    HOUSE: 5000,
+    PALACE: 10000
+  };
   var adForm = document.querySelector('.ad-form');
   var inputHousePrice = document.querySelector('#price');
 
@@ -52,17 +78,19 @@
   function createPins(offersList) {
     var pinTemplate = document.querySelector('.map__pin');
     var pinFragment = document.createDocumentFragment();
-    for (var i = 0; i < offersList.length && i < PIN_LIMIT; i++) {
-      var template = pinTemplate.cloneNode(true);
-      template.style = 'left: ' + (offersList[i].location.x - SIZE_X) + 'px; top: ' + (offersList[i].location.y - SIZE_Y) + 'px';
-      template.querySelector('img').src = offersList[i].author.avatar;
-      template.querySelector('img').setAttribute('id', offersList[i].id);
-      template.setAttribute('id', offersList[i].id);
-      template.addEventListener('click', function (event) {
-        window.card.createPinOffer(event);
-      }, false);
-      pinFragment.appendChild(template);
-    }
+    offersList.forEach(function (el, i) {
+      if (i < PIN_LIMIT) {
+        var template = pinTemplate.cloneNode(true);
+        template.style = 'left: ' + (el.location.x - SIZE_X) + 'px; top: ' + (el.location.y - SIZE_Y) + 'px';
+        template.querySelector('img').src = el.author.avatar;
+        template.querySelector('img').setAttribute('id', el.id);
+        template.setAttribute('id', el.id);
+        template.addEventListener('click', function (event) {
+          window.card.createPinOffer(event);
+        }, false);
+        pinFragment.appendChild(template);
+      }
+    });
     pins.appendChild(pinFragment);
   }
 
@@ -70,35 +98,35 @@
     var capacity = document.querySelector('#capacity');
     var roomNumber = document.querySelector('#room_number');
     var options = capacity.querySelectorAll('option');
-    for (var i = 0; i < options.length; i++) {
-      capacity.removeChild(options[i]);
-    }
+    options.forEach(function (el) {
+      capacity.removeChild(el);
+    });
     var newOptions = [];
     switch (roomNumber.value) {
-      case '1':
-        newOptions.push({value: '1', text: 'для 1 гостя'});
+      case Room.NUMBER_1:
+        newOptions.push({value: RoomSize.VALUE_1, text: RoomCapacity.TEXT_1});
         break;
-      case '2':
-        newOptions.push({value: '1', text: 'для 1 гостя'});
-        newOptions.push({value: '2', text: 'для 2 гостей'});
+      case Room.NUMBER_2:
+        newOptions.push({value: RoomSize.VALUE_1, text: RoomCapacity.TEXT_1});
+        newOptions.push({value: RoomSize.VALUE_2, text: RoomCapacity.TEXT_2});
         break;
-      case '3':
-        newOptions.push({value: '1', text: 'для 1 гостя'});
-        newOptions.push({value: '2', text: 'для 2 гостей'});
-        newOptions.push({value: '3', text: 'для 3 гостей'});
+      case Room.NUMBER_3:
+        newOptions.push({value: RoomSize.VALUE_1, text: RoomCapacity.TEXT_1});
+        newOptions.push({value: RoomSize.VALUE_2, text: RoomCapacity.TEXT_2});
+        newOptions.push({value: RoomSize.VALUE_3, text: RoomCapacity.TEXT_3});
         break;
-      case '100':
-        newOptions.push({value: '0', text: 'не для гостей'});
+      case Room.NUMBER_100:
+        newOptions.push({value: RoomSize.ROOM_NUMBER_VALUE_0, text: RoomCapacity.TEXT_0});
         break;
     }
 
     var capacityFragment = document.createDocumentFragment();
-    for (var j = 0; j < newOptions.length; j++) {
+    newOptions.forEach(function (el) {
       var optionElement = document.createElement('option');
-      optionElement.setAttribute('value', newOptions[j].value);
-      optionElement.textContent = newOptions[j].text;
+      optionElement.setAttribute('value', el.value);
+      optionElement.textContent = el.text;
       capacityFragment.appendChild(optionElement);
-    }
+    });
     capacity.appendChild(capacityFragment);
   }
 
@@ -121,9 +149,11 @@
 
   function deletePins() {
     var buttons = pins.querySelectorAll('button');
-    for (var i = 1; i < buttons.length; i++) {
-      pins.removeChild(buttons[i]);
-    }
+    buttons.forEach(function (el, i) {
+      if (i > 0) {
+        pins.removeChild(el);
+      }
+    });
   }
 
   var selectRoomNumber = adForm.elements.namedItem('rooms');
@@ -136,17 +166,17 @@
     inputHousePrice.removeAttribute('placeholder');
     var newOptions;
     switch (selectHouseType.value) {
-      case 'bungalo':
-        newOptions = {placeholder: BUNGALO_PLH, min: BUNGALO_PLH};
+      case HouseType.BUNGALO:
+        newOptions = {placeholder: PlaceholderValue.BUNGALO, min: PlaceholderValue.BUNGALO};
         break;
-      case 'flat':
-        newOptions = {placeholder: FLAT_PLH, min: FLAT_PLH};
+      case HouseType.FLAT:
+        newOptions = {placeholder: PlaceholderValue.FLAT, min: PlaceholderValue.FLAT};
         break;
-      case 'house':
-        newOptions = {placeholder: HOUSE_PLH, min: HOUSE_PLH};
+      case HouseType.HOUSE:
+        newOptions = {placeholder: PlaceholderValue.HOUSE, min: PlaceholderValue.HOUSE};
         break;
-      case 'palace':
-        newOptions = {placeholder: PALACE_PLH, min: PALACE_PLH};
+      case HouseType.PALACE:
+        newOptions = {placeholder: PlaceholderValue.PALACE, min: PlaceholderValue.PALACE};
         break;
       default:
         return;
@@ -164,8 +194,8 @@
     selectTimeIn.value = evt.currentTarget.value;
   });
 
-  adForm.addEventListener('submit', function (event) {
-    event.preventDefault();
+  adForm.addEventListener('submit', function (evt) {
+    evt.preventDefault();
     var formData = new FormData(adForm);
 
     window.backend.send(formData, postOnLoad, onError);

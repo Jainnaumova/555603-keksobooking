@@ -41,23 +41,23 @@
 
     var list = removeChildren(newMapCard.querySelector('.popup__features'));
     var featureFragment = document.createDocumentFragment();
-    for (var i = 0; i < singleOffer.offer.features.length; i++) {
+    singleOffer.offer.features.forEach(function (el) {
       var element = document.createElement('li');
       element.className = 'popup__feature';
-      element.classList.add('popup__feature--' + singleOffer.offer.features[i]);
-      element.textContent = singleOffer.offer.features[i];
+      element.classList.add('popup__feature--' + el);
+      element.textContent = el;
       featureFragment.appendChild(element);
-    }
+    });
     list.appendChild(featureFragment);
 
     var photos = newMapCard.querySelector('.popup__photos');
     var photoTemplate = photos.querySelector('.popup__photo');
     var photoFragment = document.createDocumentFragment();
-    for (var j = 0; j < singleOffer.offer.photos.length; j++) {
+    singleOffer.offer.photos.forEach(function (el) {
       var photo = photoTemplate.cloneNode(true);
-      photo.src = singleOffer.offer.photos[j];
+      photo.src = el;
       photoFragment.appendChild(photo);
-    }
+    });
     newMapCard.querySelector('.popup__close').addEventListener('click', window.utilKeyCode.buttonClickHandler);
     photos.removeChild(photoTemplate);
     photos.appendChild(photoFragment);

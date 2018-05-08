@@ -5,20 +5,32 @@
 
   var MIN_HIGH_PRICE = 50000;
   var MAX_MIN_PRICE = 10000;
-  var OPTION_ANY = 'any';
+  var Price = {
+    OPTION_ANY: 'any',
+    LOW_PRICE: 'low',
+    MIDDLE_PRICE: 'middle',
+    HIGH_PRICE: 'high'
+  };
+  var IndexNumber = {
+    INDEX_0: 0,
+    INDEX_1: 1,
+    INDEX_2: 2,
+    INDEX_3: 3
+  };
+
   function checkPrice(price, priceType) {
     switch (priceType) {
-      case 'low':
+      case Price.LOW_PRICE:
         if (price < MAX_MIN_PRICE) {
           return true;
         }
         break;
-      case 'middle':
+      case Price.MIDDLE_PRICE:
         if (price >= MAX_MIN_PRICE && price < MIN_HIGH_PRICE) {
           return true;
         }
         break;
-      case 'high':
+      case Price.HIGH_PRICE:
         if (price >= MIN_HIGH_PRICE) {
           return true;
         }
@@ -33,12 +45,13 @@
     if (window.utilFunc.checkIfCardIsOpen()) {
       window.utilKeyCode.buttonClickHandler();
     }
+
     var filterSelectors = document.querySelector('.map__filters');
     return (
-      (filterSelectors[0].value === OPTION_ANY ? singleOffer : singleOffer.offer.type === filterSelectors[0].value) &&
-      (filterSelectors[1].value === OPTION_ANY ? singleOffer : checkPrice(singleOffer.offer.price, filterSelectors[1].value)) &&
-      (filterSelectors[2].value === OPTION_ANY ? singleOffer : singleOffer.offer.rooms === +filterSelectors[2].value) &&
-      (filterSelectors[3].value === OPTION_ANY ? singleOffer : singleOffer.offer.guests === +filterSelectors[3].value) &&
+      (filterSelectors[IndexNumber.INDEX_0].value === Price.OPTION_ANY ? singleOffer : singleOffer.offer.type === filterSelectors[IndexNumber.INDEX_0].value) &&
+      (filterSelectors[IndexNumber.INDEX_1].value === Price.OPTION_ANY ? singleOffer : checkPrice(singleOffer.offer.price, filterSelectors[IndexNumber.INDEX_1].value)) &&
+      (filterSelectors[IndexNumber.INDEX_2].value === Price.OPTION_ANY ? singleOffer : singleOffer.offer.rooms === +filterSelectors[IndexNumber.INDEX_2].value) &&
+      (filterSelectors[IndexNumber.INDEX_3].value === Price.OPTION_ANY ? singleOffer : singleOffer.offer.guests === +filterSelectors[IndexNumber.INDEX_3].value) &&
       filterCheckboxes(singleOffer)
     );
   }

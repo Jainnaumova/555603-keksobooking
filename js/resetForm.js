@@ -6,6 +6,7 @@
   var RESET_MIN = 0;
   var map = document.querySelector('.map');
   var adForm = document.querySelector('.ad-form');
+  var mapFilters = document.querySelector('.map__filters');
   var mainPin = document.querySelector('.map__pin--main');
   var formFieldsets = document.querySelectorAll('fieldset');
   var initialPinX;
@@ -41,19 +42,23 @@
   }
 
   function resetInputData() {
-    var allInputs = document.querySelectorAll('input');
-    var selectors = document.querySelectorAll('select');
+    var adFormInputs = adForm.querySelectorAll('input');
+    var filterSelectors = mapFilters.querySelectorAll('select');
+    var adFormSelectors = adForm.querySelectorAll('select');
+    var combinedSelectors = Array.from(filterSelectors).concat(Array.from(adFormSelectors));
 
     if (window.selectorsInitialValues.length) {
-      for (var k = 0; k < selectors.length; k++) {
-        selectors[k].value = window.selectorsInitialValues[k];
-      }
+      combinedSelectors.forEach(function (el, i) {
+        el.value = window.selectorsInitialValues[i];
+      });
     }
 
+    adFormInputs.forEach(function (el) {
+      el.value = '';
+    });
+
     document.querySelector('textarea').value = '';
-    for (var j = allInputs.length; j--;) {
-      allInputs[j].value = '';
-    }
+
     var checkboxInputs = document.querySelectorAll('input[type=checkbox]');
     for (var i = checkboxInputs.length; i--;) {
       if (checkboxInputs[i].checked) {
@@ -65,9 +70,9 @@
   }
 
   function getDisableFieldsets() {
-    for (var i = 0; i < formFieldsets.length; i++) {
-      formFieldsets[i].setAttribute('disabled', true);
-    }
+    formFieldsets.forEach(function (el) {
+      el.setAttribute('disabled', true);
+    });
   }
 
   var inputHousePrice = document.querySelector('#price');
