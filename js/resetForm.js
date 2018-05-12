@@ -45,6 +45,7 @@
     var adFormInputs = adForm.querySelectorAll('input');
     var filterSelectors = mapFilters.querySelectorAll('select');
     var adFormSelectors = adForm.querySelectorAll('select');
+    var adFormImg = adForm.querySelectorAll('img');
     var combinedSelectors = Array.from(filterSelectors).concat(Array.from(adFormSelectors));
 
     if (window.selectorsInitialValues.length) {
@@ -55,6 +56,10 @@
 
     adFormInputs.forEach(function (el) {
       el.value = '';
+    });
+
+    adFormImg.forEach(function (el) {
+      el.src = 'img/muffin-grey.svg';
     });
 
     document.querySelector('textarea').value = '';
